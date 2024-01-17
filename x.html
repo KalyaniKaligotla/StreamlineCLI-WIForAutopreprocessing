@@ -1,0 +1,276 @@
+<!-- model_build_task.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Build Task</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .tasks-list {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .tasks-list li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Model Build Task</h1>
+
+    <form id="modelBuildForm">
+        <label for="taskType">Select Task Type:</label>
+        <select id="taskType" name="taskType">
+            <option value="" selected disabled>Select Task Type</option>
+            <option value="regression">Regression</option>
+            <option value="classification">Classification</option>
+        </select>
+        <br><br>
+        <div id="algorithmOptions" style="display:none;">
+            <label for="algorithm">Select Algorithm:</label>
+            <select id="algorithm" name="algorithm">
+                <option value="" selected disabled>Select Algorithm</option>
+            </select>
+        </div>
+        <br><br>
+        <div id="columnOptions" style="display:none;">
+            <label for="selectedColumns">Select Columns:</label>
+            <select id="selectedColumns" name="selectedColumns" multiple></select>
+        </div>
+        <br><br>
+        <button type="button" id="buildModelButton">Build Model</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Function to get column options based on task type and algorithm
+            function getColumnOptions(taskType, algorithm) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/get_column_options',
+                    data: {
+                        task_type: taskType,
+                        algorithm: algorithm
+                    },
+                    success: function (data) {
+                        $("#selectedColumns").empty();
+                        $.each(data, function (index, value) {
+                            $("#selectedColumns").append('<option value="' + value + '">' + value + '</option>');
+                        });
+                        $("#columnOptions").show();
+                    }
+                });
+            }
+
+            // Populate algorithms based on the selected task type
+            $("#taskType").change(function () {
+                var selectedTaskType = $(this).val();
+                if (selectedTaskType === "") {
+                    $("#algorithmOptions").hide();
+                    $("#columnOptions").hide();
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/get_algorithm_options',
+                        data: { task_type: selectedTaskType },
+                        success: function (data) {
+                            $("#algorithm").html(data);
+                            $("#algorithmOptions").show();
+                        }
+                    });
+                }
+            });
+
+            // Toggle the visibility of columns based on the selected algorithm
+            $("#algorithm").change(function () {
+                var selectedAlgorithm = $(this).val();
+                if (selectedAlgorithm === "") {
+                    $("#columnOptions").hide();
+                } else {
+                    var selectedTaskType = $("#taskType").val();
+                    getColumnOptions(selectedTaskType, selectedAlgorithm);
+                }
+            });
+
+            // Handle the Build Model button click event
+            $("#buildModelButton").click(function () {
+                var selectedColumns = $("#selectedColumns").val();
+                var selectedAlgorithm = $("#algorithm").val();
+                var taskType = $("#taskType").val();
+
+                // Check if columns are selected
+                if (!selectedColumns || selectedColumns.length === 0) {
+                    alert("Please select at least one column.");
+                    return;
+                }
+
+                // Add your logic to build the model with selectedColumns, selectedAlgorithm, and taskType
+                // You can use AJAX to send this information to the server for further processing
+                // For now, we'll just log the selected information to the console
+                console.log("Selected Columns:", selectedColumns);
+                console.log("Selected Algorithm:", selectedAlgorithm);
+                console.log("Task Type:", taskType);
+
+                // Call the function to build the model on the server
+                buildModel(selectedColumns, selectedAlgorithm, taskType);
+            });
+
+            // Function to build the model on the server
+            function buildModel(columns, algorithm, taskType) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/build_model',
+                    data: {
+                        columns: columns,
+                        algorithm: algorithm,
+                        task_type: taskType
+                    },
+                    success: function (data) {
+                        // Handle the success response from the server
+                        console.log("Model built successfully:", data);
+                        alert("Model built successfully!");
+                    },
+                    error: function (error) {
+                        // Handle the error response from the server
+                        console.error("Error building model:", error.responseText);
+                        alert("Error building model. Please try again.");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+from flask import get_flashed_messages, jsonify, json
+import seaborn as sns
+import matplotlib.pyplot as plt
+from flask import Response
+import io
+
+
+# Existing confusion_matrix_plot route
+@app.route('/confusion_matrix_plot', methods=['POST', 'GET'])
+def confusion_matrix_plot():
+    # Retrieve the confusion matrix from the flashed messages
+    confusion_mat_json = get_flashed_messages(category_filter='confusion_mat')[0]
+    confusion_mat = np.array(json.loads(confusion_mat_json))
+
+    # Create a heatmap plot
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(confusion_mat, annot=True, fmt='d', cmap='Blues', cbar=False)
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+
+    # Save the plot to a BytesIO object
+    image_stream = io.BytesIO()
+    plt.savefig(image_stream, format='png')
+    image_stream.seek(0)
+
+    # Return the image as a file response
+    return send_file(image_stream, mimetype='image/png', as_attachment=True, download_name='confusion_matrix.png')
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Model Evaluation Metrics</title>
+        <style>
+            table {
+                width: 50%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+    
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+    
+            th {
+                background-color: #f2f2f2;
+            }
+    
+            .confusion-matrix {
+                margin-top: 20px;
+            }
+    
+            .heatmap-link {
+                display: block;
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Model Evaluation Metrics</h1>
+    
+        {% if metrics %}
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+                {% for key, value in metrics.items() %}
+                    {% if key not in ['confusion_matrix_plot_path'] %}
+                        <tr>
+                            <td>{{ key }}</td>
+                            <td>
+                                {% if key in ['precision', 'recall', 'accuracy'] %}
+                                    {{ '%.2f%%' | format(value * 100) }}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+            
+            <!-- Conditionally include the confusion matrix section -->
+            {% if confusion_matrix_plot_url %}
+            <div class="confusion-matrix">
+                <h2>Confusion Matrix</h2>
+                <img src="{{ confusion_matrix_plot_url }}" alt="Confusion Matrix">
+            </div>
+            {% endif %}
+        {% else %}
+            <p>No metrics available.</p>
+        {% endif %}
+    </body>
+    </html>
+    
