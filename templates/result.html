@@ -1,0 +1,77 @@
+<!-- templates/result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        pre {
+            font-size: 14px;
+            background-color: #fff;
+            padding: 10px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .alert {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 10px;
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Task Result</h2>
+
+    {% if task_type == 'show_dataset_after_imputation' %}
+        {% if dataset %}
+            <!-- Display the dataset as a table -->
+            {{ dataset|safe }}
+        {% else %}
+            <p>No dataset available.</p>
+        {% endif %}
+    {% else %}
+        <!-- Display other results -->
+        {% if result %}
+            <pre>{{ result }}</pre>
+        {% else %}
+            <p>No result available.</p>
+        {% endif %}
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="alert">
+                {% for category, message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    
+</body>
+</html>

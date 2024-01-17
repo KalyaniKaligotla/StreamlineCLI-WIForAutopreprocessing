@@ -1,0 +1,70 @@
+<!-- templates/select_encoding_option.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Encoding Option</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        select, input {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Select Encoding Option</h2>
+    <form action="/perform_encoding_task" method="post">
+        <p>Select an encoding option:</p>
+        <select name="encoding_option" required>
+            <option value="one_hot">Perform One Hot Encoding</option>
+            <option value="label">Perform Label Encoding</option>
+            <option value="show_dataset">Show Dataset</option>
+            <!-- Add more encoding options as needed -->
+        </select>
+
+        {% if encoding_option == 'show_dataset' %}
+            <p>Note: The dataset will be displayed without any encoding.</p>
+        {% else %}
+            <p>Select columns for encoding:</p>
+            {% for column in categorical_columns %}
+                <label><input type="checkbox" name="selected_columns" value="{{ column }}"> {{ column }}</label><br>
+            {% endfor %}
+        {% endif %}
+
+        <button type="submit">Perform Encoding</button>
+    </form>
+</body>
+</html>

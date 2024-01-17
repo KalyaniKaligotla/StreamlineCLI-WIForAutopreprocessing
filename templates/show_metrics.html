@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Evaluation Metrics</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .confusion-matrix {
+            margin-top: 20px;
+        }
+
+        .heatmap-link {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Model Evaluation Metrics</h1>
+
+    {% if metrics %}
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+            </tr>
+            {% for key, value in metrics.items() %}
+                {% if key not in ['confusion_matrix_plot_path', 'regression_plot_path'] %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>
+                            {{ '%.2f' | format(value * 100) }}
+                            
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+        
+        <!-- Conditionally include the confusion matrix section -->
+        {% if confusion_matrix_plot_url %}
+        <div class="confusion-matrix">
+            <h2>Confusion Matrix</h2>
+            <img src="{{ confusion_matrix_plot_url }}" alt="Confusion Matrix">
+        </div>
+        {% endif %}
+        {% if regression_plot_path_url %}
+    <div class="scatter-plot">
+        <h2>regression-plot</h2>
+        <img src="{{ regression_plot_path_url }}" alt="Regression Plot">
+    </div>
+    {% endif %}
+    {% else %}
+        <p>No metrics available.</p>
+    {% endif %}
+</body>
+</html>

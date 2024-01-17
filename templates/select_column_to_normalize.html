@@ -1,0 +1,71 @@
+<!-- templates/select_column_to_normalize.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Column to Normalize</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .tasks-list {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .tasks-list li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Select Column to Normalize</h2>
+    <form action="/perform_normalization" method="post">
+        <p>Select a column to normalize:</p>
+        <select name="column_to_normalize" required>
+            {% for column in columns %}
+                <option value="{{ column }}">{{ column }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="hidden" name="normalization_option" value="{{ normalization_option }}">
+
+        <!-- Retrieve normalization_option from the form data -->
+        <input type="hidden" name="normalization_option" value="{{ request.form['normalization_option'] }}">
+        
+        <!-- Pass the normalization_option from the request.args to maintain it in the next step -->
+        <input type="hidden" name="normalization_option" value="{{ request.args.get('normalization_option') }}">
+        
+        <button type="submit">Continue</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!-- templates/select_normalization_option.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Normalization Option</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .tasks-list {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .tasks-list li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Select Normalization Option</h2>
+    <form action="/perform_minmax_normalization" method="post">
+        <p>Select a normalization option:</p>
+        <select name="normalization_option" required>
+            <option value="normalize_specific_column">Normalize a Specific Column</option>
+            <option value="normalize_whole_dataset">Normalize the Whole Dataset</option>
+            <option value="show_dataset_after_normalization">Show Dataset</option>
+        </select>
+        {% if normalization_option == 'normalize_specific_column' %}
+            <!-- If normalizing a specific column, show the column selection dropdown -->
+            <p>Select a column to normalize:</p>
+            <select name="column_to_normalize" required>
+                {% for column in columns %}
+                    <option value="{{ column }}">{{ column }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+
+        <button type="submit">Continue</button>
+    </form>
+</body>
+</html>

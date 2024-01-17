@@ -1,0 +1,96 @@
+<!-- templates/tasks.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Selection</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .tasks-list {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .tasks-list li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Select Task</h2>
+    <form action="/perform_task" method="post">
+        <select name="task" required>
+            <option value="" selected disabled>Select Task Type</option>
+            <option value="describe">Data Description</option>
+            <option value="remove_null">Remove Null Values</option>
+            <option value="encode_categorical">Encode Categorical Data</option>
+            <option value="scale_features">Feature Scaling</option>
+            
+            <option value="model_build">Model Building</option>
+            <option value="download_dataset">Download Modified Dataset</option>
+        </select>
+        <input type="hidden" name="target_column" value="target_column">
+        <button type="submit">Next</button>
+    </form>
+
+    {% if task == 'encode_categorical' %}
+        <div class="tasks-list">
+            <h3>Tasks</h3>
+            <ol>
+                <li><a href="{{ url_for('show_categorical_columns') }}">1. Show Categorical Columns</a></li>
+                <li><a href="{{ url_for('select_encoding_option') }}">2. Select Encoding Option</a></li>
+                <li><a href="{{ url_for('show_dataset') }}">3. Show the Dataset</a></li>
+            </ol>
+        </div>
+    {% endif %}
+    <!-- {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %} -->
+<script>
+    document.getElementById('taskDropdown').addEventListener('change', function() {
+        if (this.value === 'download_dataset') {
+            document.getElementById('taskForm').submit();
+        }
+    });
+</script>
+
+
+</body>
+</html>
