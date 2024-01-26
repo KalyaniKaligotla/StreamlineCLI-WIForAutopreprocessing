@@ -1,11 +1,11 @@
-# from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_score, recall_score, f1_score
+from sklearn.svm import SVC
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 
 class ModelBuilder:
@@ -13,7 +13,8 @@ class ModelBuilder:
         ('Logistic Regression', LogisticRegression()),
         ('Decision Tree', DecisionTreeClassifier()),
         ('Random Forest', RandomForestClassifier()),
-        ('K-Nearest Neighbors', KNeighborsClassifier())
+        ('K-Nearest Neighbors', KNeighborsClassifier()),
+        ('SVM', SVC())
     ]
 
     regression_algorithms = [
@@ -90,24 +91,20 @@ class ModelBuilder:
         if task == "Regression":
             # Evaluate the regression model
             mse = mean_squared_error(y_test, predictions)
+            mae = mean_absolute_error(y_test, predictions)
             r2 = r2_score(y_test, predictions)
 
             print(f"\nMean Squared Error: {mse}")
+            print(f"\nMean Absolute Error: {mae}")
             print(f"\nR-squared Score: {r2}")
             print(f"\nAccuracy: {100*r2}")
 
         elif task == "Classification":
             # Evaluate the classification model
             accuracy = accuracy_score(y_test, predictions)
-            precision = precision_score(y_test, predictions, average='weighted')
-            recall = recall_score(y_test, predictions, average='weighted')
-            f1 = f1_score(y_test, predictions, average='weighted')
             classification_rep = classification_report(y_test, predictions)
             confusion_mat = confusion_matrix(y_test, predictions)
 
-            print(f"\nAccuracy: {accuracy:.2f*100}")
-            print(f"Precision: {precision:.2f}")
-            print(f"Recall: {recall:.2f}")
-            print(f"F1 Score: {f1:.2f}")
+            print(f"\nAccuracy: {accuracy:.2f}")
             print("\nClassification Report:\n", classification_rep)
             print("\nConfusion Matrix:\n", confusion_mat)
